@@ -1,4 +1,4 @@
-# vue2_project
+# vue2_examples
 
 ## Project setup
 ```
