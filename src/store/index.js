@@ -41,7 +41,6 @@ export default new Vuex.Store({
     user: null,
     employees: []
   },
-  
   actions: {
     reset (context) {
       context.commit('resetState')

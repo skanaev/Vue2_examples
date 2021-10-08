@@ -88,7 +88,7 @@
     <div>
       <button type="button" class="btn btn-primary" @click="counterUp"> Кликни на меня  </button>
       <button type="button" class="btn btn-primary" style="marginLeft: 10px" @click="counter = 0"> Очистить </button>
-      <div class="description" :class="{'green': сounterMoreThan5()}"> Использум method: Кол-во кликов: {{counter}} </div>
+      <!-- <div class="description" :class="{'green': сounterMoreThan5()}"> Использум method: Кол-во кликов: {{counter}} </div> -->
       <div class="description" :class="{'green': сounterIsGreen}"> Использум computed: Кол-во кликов: {{counter}} </div>
     </div>
     <div class="border" />
@@ -122,11 +122,34 @@
     </li>
   
     <!-- <div> Отфильтрованные todo: {{filteredTodos}}</div>  -->
-
     <button type="button" class="btn btn-primary" style="margin: 10px" @click="todos = []"> Очистить список  </button> 
-    <div> {{getText()}}</div> 
+
+    <!-- Проблемы с реактивностью объектов -->
+    <div v-if="additionalData.counter !== undefined" @click="additionalData.counter = additionalData.counter + 1">Кликай, чтобы увеличить счётчик {{additionalData.counter}} </div>
+
     <div class="border" />
-  
+
+     <!------------------------------------------------------------------>
+
+    <h1 style="marginTop: 45px; marginBottom: 25px;"> Проблемы реактивности у массивов </h1>
+    <ul class="list-group">
+      <li
+        v-for="(item, index) in arrList"
+        :key="index"
+        class="list-group-item"
+        >
+          {{item}} 
+      </li>
+    </ul>
+                                                                       <!-- @click="arrList.length = 1" -->
+    <button type="button" class="btn btn-primary" style="margin: 10px" @click="arrList.length = 1"> Сократить список до 1 элемента </button> 
+    <button type="button" class="btn btn-primary" style="margin: 10px" @click="arrList[1] = 'x'"> Изменить значение 1 элемента на 'x' </button> 
+    <br>
+    <button type="button" class="btn btn-primary" style="margin: 10px" @click="arrList.splice(1)"> Реактивно сократить список до 1 элемента </button> 
+    <button type="button" class="btn btn-primary" style="margin: 10px" @click="$set(arrList, 1, 'x')"> Реактивно изменить значение 1 элемента на 'x' </button> 
+    <br>
+    <button type="button" class="btn btn-primary" style="margin: 10px" @click="arrList = ['a', 'b', 'c']"> Восстановить исходные </button> 
+    <div class="border" />
     <!------------------------------------------------------------------>
 
     <h1 style="marginTop: 45px; marginBottom: 25px;"> Слоты </h1>
@@ -188,7 +211,8 @@ export default {
         {id: '5', text: "learn Vue"},
         {id: '6', text: "play computer"}
       ],
-      todos: []
+      todos: [],
+      arrList: ['a', 'b', 'c']
     }
   },
   methods: {
@@ -215,17 +239,15 @@ export default {
     addNewTodo (todo) {
       const id = +new Date()
       this.todos.push({id: id, text: todo})
-      if (this.todos.length === 5) this.additionalData.someText = 'Вы добавили уже 5 дел' // Проблема реактивности у объектов
 
-      // Как пофиксить: if (this.todos.length === 5) this.$set(this.additionalData, 'someText', 'Вы добавили уже 5 дел')
-
-      // Проблемы реактивности у массивов (потестить в консоли)
-      // this.todos.length = 3 // не реактивно  //fix: $vm.todos.splice(3)
-      // this.todos[1] = {id: 0, text: 'new text'} // не реактивно  //fix $vm.todos.splice(0, 1, {id: '123123', text: 'reactive changes'})
-    },                                                               // $vm.$set($vm.todos, 0, {id: '123123', text: 'reactive changes'})
-    getText() {
-      return `Значение переменной someText: ${this.additionalData.someText ? this.additionalData.someText : 'Переменная ещё не существует на экземпляре компонента'}`
-    }
+      // START Проблема реактивности у объектов
+      if (this.todos.length === 5) {
+        // this.additionalData.counter = 0
+      // Как пофиксить: 
+          this.$set(this.additionalData, 'counter', 0) 
+      }
+      // END Проблема реактивности у объектов
+    },
   },
   computed: {
     ...mapState({
